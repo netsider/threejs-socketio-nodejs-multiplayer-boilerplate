@@ -6,7 +6,7 @@ var app = require('http').createServer(handler)
 var users = Array();
 app.listen(8080);
 function handler (req, res) {
-  fs.readFile(__dirname + '/client-fully-working.html',
+  fs.readFile(__dirname + '/client.html',
   function (err, data) {
     if (err) {
       res.writeHead(500);
