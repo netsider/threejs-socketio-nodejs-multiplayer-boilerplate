@@ -1,0 +1,213 @@
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script src="three.js"></script>
+<script type="text/javascript" src="stats.js"></script> 
+		<script type="text/javascript" src="dat.gui.js"></script> 
+		<script src="FlyControls.js"></script>
+<body>
+ <div id="signin" style="right: 100px;width:20%; margin:30px;position: fixed;background-color: white;opacity: 0.5;">
+		<h1>Please enter your name</h1>
+		<input type='text' id='userNameField'>
+		<button value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();'>Start</button>
+</div>
+<div id="userhead" style="left:100px; width:20%; margin:30px;position: fixed;background-color: white;"><h1>User List</h1><hr>
+	<div id="leave"><button onclick='update()'>Leave</button></div>
+	<div id="userlist" style=""></div> 
+</div>
+<script>
+	var cpath = window.location.pathname.split('/').pop();
+	$('#userlist').html('<p>'+cpath+'</p>');
+    var renderer;
+    var scene;
+    var camera;
+
+    function init() {
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        scene = new THREE.Scene();
+        // create a camera, which defines where we're looking at.
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // create a render, sets the background color and the size
+        renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0x000000, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+       //renderer.shadowMapEnabled = true;
+     
+        camera.position.x = 10;
+        camera.position.y = 10;
+        camera.position.z = 10;
+        camera.lookAt(scene.position);
+		
+		var ambient = new THREE.AmbientLight(0x808080);
+      scene.add(ambient);
+		
+        // add spotlight for the shadows
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(10, 20, 20);
+        spotLight.shadowCameraNear = 20;
+        spotLight.shadowCameraFar = 50;
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+        document.body.appendChild(renderer.domElement);  // add the output of the renderer to the html element
+		//addControlGui(control);
+        //addStatsObject();
+		controls = new THREE.FlyControls( camera );
+        render();
+    }
+	
+	function make(playerX, playerY, playerZ = 15){
+		//console.log("getplayer()");
+        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
+        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+		cube.position.x = playerX;
+        cube.position.y = playerY;
+        cube.position.z = 20;
+		 scene.add(cube);
+	}
+
+        control = new function () {
+            this.rotationSpeed = 0.001;
+        };
+	   function addControlGui(controlObject) {
+        var gui = new dat.GUI();
+        gui.add(controlObject, 'rotationSpeed', -0.01, 0.01);
+    }
+    function addStatsObject() {
+        stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+        document.body.appendChild(stats.domElement);
+    }
+
+    function render() {
+		//draw();
+		
+        var rotSpeed = control.rotationSpeed;
+        //camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
+        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
+        //camera.lookAt(scene.position);
+		controls.update( delta );
+        // render using requestAnimationFrame
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+    /**
+     * Function handles the resize event. This make sure the camera and the renderer
+     * are updated at the correct moment.
+     */
+    function handleResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+    // calls the init function when the window is done loading.
+    window.onload = init;
+    // calls the handleResize function when the window is resized
+    window.addEventListener('resize', handleResize, false);
+</script>
+</body>
+		<script src="socket.io.js"></script> 
+<script> 
+
+	var socket = io.connect('http://127.0.0.1:8080/');
+	var userName = ''; 
+    var playerX = new Array();
+	var playerY = new Array(); 
+	var userlist = '';
+	var usernumber; 
+	var clientid = new Array();
+    socket.on('getplayers', function (user) { // Takes parameter, and uses jquery to output list of third item of each array item.  Called by the setname() server function when submit button is pressee
+	console.log("getplayers(user)");
+	//console.log(JSON.stringify(user));// Returns list of users
+    	users = user; 
+    	userlist = '';
+    	var l = user.length;
+	    for (var i = 0; i < l; i++) { 		 
+	    	userlist += user[i][3]+'<br>';  // Get name of user
+    		playerX[i] = user[i][1]; // Get X coordinate of User
+			playerY[i] = user[i][2]; // Get Y coordinate of User
+    	}
+    	$('#userlist').html('<p>'+userlist+'</p>');
+    });  
+    
+	socket.on('syncplayers', function (user) { 
+	console.log("syncplayers(user)");
+	//console.log(JSON.stringify(user));// Returns list of users
+	//console.log(JSON.stringify(users));// Returns list of users
+	 
+	socketResponse("syncplayers", users);
+	users = user; // passing to global browser users
+   	var l = user.length; 
+	   for (var i = 0; i < l; i++) { // Loops through all the users in users
+    		playerX[i] = user[i][1];
+			playerY[i] = user[i][2];
+			usernumber = users.length;  
+		    users[usernumber][1] = playerX[i];
+		    users[usernumber][2] = playerY[i];  
+    	}
+    });
+
+    function socketResponse(type, data) {
+   		var socket = io.connect('http://127.0.0.1:8080/');
+ 	 	socket.emit(type, data);
+    }
+
+	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
+		console.log("playermove()");
+		console.log(JSON.stringify(users)); // Displays list of usees
+		movePlayer(keystroke,clientIndex);
+		socketResponse("syncplayers", users); 
+    }); 
+	
+	    addEventListener('keydown', function(e) { // [1] // Calls Server-keypress()
+	console.log("keydown()");
+    	// Checking browser username against socket user array to get clientID to move player
+    	if (users.length > 0) { // If users not empty
+	    	var l = users.length;
+	    	for (var i = 0; i < l; i++) {
+	    		if (users[i][3] == userName) {
+	    			clientid = i;
+	    		}
+	    	}
+    	}
+    	var clientData = new Array();
+    	clientData[0] = e.keyCode;
+    	clientData[1] = clientid; 
+		//console.log(JSON.stringify(clientData));
+    	socketResponse('keypress',clientData); 
+	}, false);   
+	
+	function movePlayer(keyStroke, clientIndex) {	//[3]
+		console.log("movePlayer()");
+		//console.log(JSON.stringify(clientIndex));
+		//console.log(JSON.stringify(keyStroke));		
+        if (keyStroke == 39) { // left
+            playerX[clientIndex]=playerX[clientIndex]+1;
+            users[clientIndex][1] = playerX[clientIndex];
+        } else if (keyStroke == 37) { // right
+            playerX[clientIndex]=playerX[clientIndex]-1;
+            users[clientIndex][1] = playerX[clientIndex];
+        }
+        if (keyStroke == 40) { // up
+            playerY[clientIndex]=playerY[clientIndex]+1;
+            users[clientIndex][2] = playerY[clientIndex];
+        } else if (keyStroke == 38) { // down
+            playerY[clientIndex]=playerY[clientIndex]-1;
+            users[clientIndex][2] = playerY[clientIndex]; 	
+        }
+		draw(users);		
+	}
+
+	function draw(user) {
+	users = user; // passing to global browser users
+	console.log("draw");
+	//console.log(users);
+	    var l = users.length;
+	    for (var i = 0; i <= l; i++) {
+		//playerX[i] = users[i][1];
+		//playerY[i] = users[i][2];
+		make(playerX[i], playerY[i], 20);
+	 	}        
+	}	
+</script>

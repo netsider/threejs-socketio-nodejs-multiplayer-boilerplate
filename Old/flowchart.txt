@@ -1,0 +1,4 @@
+- Client Calls socketresponse(setname()) to server, when user presses button.  userName is contents of the username form text field.
+- Serverside-setname() function uses sockets.emits to call getplayers() and playermove() from the client script. 
+- Clientside getplayers() function returns and print the HTML list of players.
+- Clientside playermove() calls socketResponse("syncplayers", users) to the server-side script.  It's own moveplayer() function is also called, which runs on users input.

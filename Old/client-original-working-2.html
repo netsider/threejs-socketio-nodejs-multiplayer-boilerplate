@@ -1,0 +1,153 @@
+<!-- HTML Canvas must come first  -->
+<body>
+<div style="width:50%; float:left;">
+	<canvas id="canvas1" width="1000" height="600" style="border: 1px solid black;" tabindex="1"></canvas>
+</div>
+
+<div id="signin" style="float:left; width:20%; margin:30px;">
+		<h1>Please enter your name</h1>
+		<input type='text' id='userNameField'>
+		<button value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();'>Start</button>
+</div>
+
+<div id="userhead" style="float:left; width:20%; margin:30px;"><h1>User List</h1><hr>
+	<div id="leave"><button onclick='socketResponse("leave", userName); window.location = "http://www.google.com/";'>Leave</button></div>
+	<div id="userlist" style=""></div> 
+</div>
+</body>
+
+<!-- Scripts come second -->
+<script src="socket.io.js"></script> 
+<script type='text/javascript' src='jquery.min.js'></script>
+<script> 
+
+	// Initializing Socket
+	var socket = io.connect('http://127.0.0.1:8080/');
+	var users;
+	var userName = ''; 
+    var playerX = new Array();
+	var playerY = new Array(); 
+	var userlist = '';
+	var usernumber; 
+
+	// Shows player list upon set name
+    socket.on('getplayers', function (user) { 
+    	users = user; // passing to global browser users
+    	userlist = '';
+
+    	var l = user.length;
+	    for (var i = 0; i < l; i++) { 		 
+	    	userlist += user[i][3]+'<br>'; 
+    		playerX[i] = user[i][1];
+			playerY[i] = user[i][2];
+    	}
+    	$('#userlist').html('<p>'+userlist+'</p>');
+    });  
+
+    // updates all players when new player joins
+    socket.on('syncplayers', function (user) { 
+    	users = user; // passing to global browser users
+
+    	var l = user.length; 
+	    for (var i = 0; i < l; i++) {
+    		playerX[i] = user[i][1];
+			playerY[i] = user[i][2];
+			usernumber = users.length;  
+		    users[usernumber][1] = playerX[i];
+		    users[usernumber][2] = playerY[i];  
+    	}
+    	console.log(user);   
+    });
+
+    socket.on('removeplayer', function (clientid) { 
+    	playerX.splice(clientid, 1);
+    	playerY.splice(clientid, 1);   
+    });
+
+	// Moves player and sends positioning information to server
+	socket.on('playermove', function (keystroke, clientIndex) {
+		movePlayer(keystroke,clientIndex);
+		socketResponse("syncplayers", users);
+    }); 
+
+	// Passing input from browser to socket.io server
+    function socketResponse(type, data) {
+   		var socket = io.connect('http://127.0.0.1:8080/');
+ 	 	socket.emit(type, data);
+    }
+	     
+    // Listening for input from player
+    addEventListener('keydown', function(e) {
+    	// Checking browser username against socket user array to get clientID to move player
+    	if (users.length > 0) {
+	    	var l = users.length;
+	    	for (var i = 0; i < l; i++) {
+	    		if (users[i][3] == userName) {
+	    			clientid = i;
+	    		}
+	    	}
+    	}
+    	// Chopping up client data to be passed to server
+    	var clientData = new Array();
+    	clientData[0] = e.keyCode;
+    	clientData[1] = clientid; 
+
+    	console.log(users); 
+    	socketResponse('keypress',clientData); 
+	}, false);   
+
+
+    // Begin Canvas stuffs
+	var can = document.getElementById('canvas1');
+	var ctx = can.getContext('2d');
+	can.tabIndex = 1; // quick way to get focus so keypresses register
+	ctx.font = '8px sans';
+
+	// how far offset the canvas is
+	var offsetX = 0;
+	var offsetY = 0;
+
+	function draw() {
+		//console.log('Player Data--:' + JSON.stringify(player));
+	    ctx.save();
+	    ctx.translate(offsetX, offsetY);
+	    // clear the viewport
+	    ctx.clearRect(-offsetX, -offsetY, 1000,600);
+	    
+	    // draw the player
+	    ctx.fillStyle = 'red';
+
+	    var l = playerX.length;
+	    for (var i = 0; i <= l; i++) {
+		      //  var img = new Image();
+	  		   // img.src = 'http://askapril.com/images/aprilqueen.jpg';
+		      //  var pattern = ctx.createPattern(img, 'no-repeat'); 
+	  		   // ctx.fillStyle = pattern;
+	  		   ctx.fillStyle = "blue";
+			   ctx.font = "bold 16px Arial"; 
+			   // ctx.fillText(users[i][3], playerX[i]-5, playerY[i]-7);  
+		 	   ctx.fillRect(playerX[i]-offsetX, playerY[i]-offsetY, 20, 20);
+	 	}        
+	    ctx.restore();
+	} 
+
+	function movePlayer(keyStroke, clientIndex) {   
+        if (keyStroke == 39) { // left
+            playerX[clientIndex]=playerX[clientIndex]+5;
+            users[clientIndex][1] = playerX[clientIndex];
+        } else if (keyStroke == 37) { // right
+            playerX[clientIndex]=playerX[clientIndex]-5;
+            users[clientIndex][1] = playerX[clientIndex];
+        }
+        if (keyStroke == 40) { // up
+            playerY[clientIndex]=playerY[clientIndex]+5;
+            users[clientIndex][2] = playerY[clientIndex];
+        } else if (keyStroke == 38) { // down
+            playerY[clientIndex]=playerY[clientIndex]-5;
+            users[clientIndex][2] = playerY[clientIndex]; 
+        }
+    	draw();  
+	} 
+	draw();
+    //// End Canvas Stuff ///// 
+</script>

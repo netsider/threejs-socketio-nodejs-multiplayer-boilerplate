@@ -1,0 +1,229 @@
+<html lang="en">
+		<meta charset="UTF-8">
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>	
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script> 
+		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script> 
+		<script src="http://cdn.socket.io/socket.io-1.0.0.js"></script> 
+		<script src="FlyControls.js"></script>
+<body>
+ <div id="signin" style="right: 100px;width:20%; margin:30px;position: fixed;background-color: white;opacity: 0.5;">
+		<h1>Please enter your name</h1>
+		<input type='text' id='userNameField'>
+		<button value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();'>Start</button>
+</div>
+<div id="userhead" style="left:100px; width:20%; margin:30px;position: fixed;background-color: white;"><h1>User List</h1><hr>
+	<div id="userlist" style=""></div> 
+</div>
+<script>
+	var renderer;
+    var scene;
+    var camera;
+	var cpath = window.location.pathname.split('/').pop();
+	$('#userlist').html('<p>'+cpath+'</p>'); // Prints current name to userlist (before it's populated on sign-in)
+    function init() {
+	
+		// Set-up scene, renderer, and camera
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0x000000, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+        camera.position.x = 30;
+        camera.position.y = 30;
+        camera.position.z = 30;
+        camera.lookAt(scene.position);
+		// Lighting
+		var ambient = new THREE.AmbientLight(0x808080);
+		scene.add(ambient);
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(10, 20, 20);
+        spotLight.shadowCameraNear = 20;
+        spotLight.shadowCameraFar = 50;
+        spotLight.castShadow = true;
+        scene.add(spotLight);
+        document.body.appendChild(renderer.domElement);  // add the output of the renderer to the html element
+		addControlGui(control);
+        addStatsObject();
+        render();
+    }
+	// Controls & GUI
+	//controls = new THREE.FlyControls( camera ); // This messes everything up
+	control = new function () { // Values for dat.gui framework (below this)
+        this.rotationSpeed = 0.001;
+    };
+	function addControlGui(controlObject) { // Code for the dat.gui framework
+        var gui = new dat.GUI();
+        gui.add(controlObject, 'rotationSpeed', -0.01, 0.01);
+    }
+    function addStatsObject() { // Code for the Stats.js framework
+        stats = new Stats();
+        stats.setMode(0);
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+        document.body.appendChild(stats.domElement);
+    }
+    function render() {
+        var rotSpeed = control.rotationSpeed;
+        //camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
+        camera.position.x = 20;
+        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
+        camera.position.z = 20;
+        camera.lookAt(scene.position); // Rotate Camera by using the 3 preceeding lines of code.
+        // render using requestAnimationFrame
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+    }
+    function handleResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+function ClientPlayer()
+{
+    this.Cube;
+    this.Name = "unnamed";
+    this.Id = 0;
+    this.Create = function(name,PX,PY,id)
+    {
+        this.Name = name;
+        this.Id = id;
+        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
+        this.Cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+		this.Cube.position.x = PX;
+        this.Cube.position.y = PY;
+        this.Cube.position.z = 20;
+        scene.add(this.Cube);
+    }
+    this.Move = function(vector)
+    {
+        this.Cube.position.set(this.Cube.position.x + vector.x, this.Cube.position.y + vector.y, 20);
+    }
+}
+    window.onload = init;
+    window.addEventListener('resize', handleResize, false);
+	// Begin Socket.IO Code
+	var socket = io.connect('http://127.0.0.1:8080/');
+    playerX = new Array();
+	playerY = new Array(); 
+	id = new Array();
+	users = [];
+	CPlayerList = []; // an array of player objects
+    
+	socket.on('getplayers', function (user) { // Takes parameter, and uses jquery to output list of third item of each array item.  Called by the setname() server function when submit button is pressee
+	
+	console.log("getplayers(user)");
+    	users = user; 
+    	userlist = '';
+    	var l = user.length;
+		console.log("Creating Other Players...");
+	    for (var i = 0; i < l; i++) { 		 
+	    	userlist += user[i][3]+'<br>';  // Get name of each user
+    		playerX[i] = user[i][1]; // Get X coordinate of each user
+			playerY[i] = user[i][2]; // Get Y coordinate of each user
+			id[i] = i;
+			username = user[i][3];
+		if(user[i][3] != userName){ // if not username of current client
+		Player = new ClientPlayer();
+		Player.Create(username, playerX[i], playerY[i], id[i]); // Create Other Players
+		}
+    	}
+		console.log("Creating Userlist");
+    	$('#userlist').html('<p>'+userlist+'</p>');
+    });  
+	
+	socket.on('syncplayers', function (user) { 
+		console.log("syncplayers(user)");
+		//console.log(JSON.stringify(user));// Returns list of users
+		//console.log(JSON.stringify(users));// Also Returns list of users (?)
+		socketResponse("syncplayers", users);
+		users = user; // passing to global browser users
+	
+		var l = user.length; 
+			for (var i = 0; i < l; i++) { // Loops through all the users in users
+				playerX[i] = user[i][1];
+				playerY[i] = user[i][2];
+				usernumber = users.length; // Amount of users
+				users[usernumber][1] = playerX[i];
+				users[usernumber][2] = playerY[i];  
+			}
+	});
+    function socketResponse(type, data) {
+   		var socket = io.connect('http://127.0.0.1:8080/');
+ 	 	socket.emit(type, data);
+    }
+	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
+		console.log("playermove()");
+		console.log(JSON.stringify(users)); // Returns list of users
+		movePlayer(keystroke,clientIndex);
+		socketResponse("syncplayers", users); 
+    }); 
+	
+	socket.on('playercreate', function (username, PX, PY, ID) {
+		console.log("Playercreate()");
+		Player = new ClientPlayer();
+		Player.Create(username, PX, PY, ID);
+		CPlayerList.push(Player);
+		console.log("X");
+		console.log(JSON.stringify(PX)); 
+		console.log("Y");
+		console.log(JSON.stringify(PY)); 
+		console.log("ID");
+		console.log(JSON.stringify(ID));
+		console.log("username");
+		console.log(JSON.stringify(username));		
+    }); 
+	    addEventListener('keydown', function(e) { // [1] // Calls Server-keypress()
+		var clientid;
+	console.log("keydown()");
+    	if (users.length > 0) { // If users not empty
+	   	var l = users.length; // Loop the length of users array/object
+	    	for (var i = 0; i < l; i++) {
+	    		if (users[i][3] == userName) { // If name (third element) from array matches userName from text field then:
+	    			clientid = i;
+					//console.log("Test:");
+					//console.log(clientid);
+					//console.log(users[i][0]);
+	    		}
+	    	}
+    	}
+    	var clientData = new Array();
+    	clientData[0] = e.keyCode;
+    	clientData[1] = clientid; 
+		//console.log(JSON.stringify(clientData));
+    	socketResponse('keypress',clientData); 
+	}, false);   
+	function movePlayer(keyStroke, clientIndex) {
+		console.log("movePlayer()");
+		//console.log(JSON.stringify(clientIndex));
+		//console.log(JSON.stringify(keyStroke));
+			console.log("Players:");
+		//console.log(CPlayerList.toString());
+		//console.log(JSON.stringify(CPlayerList));
+		console.log(CPlayerList);
+		
+        if (keyStroke == 39) { // left
+            playerX[clientIndex]=playerX[clientIndex]+1; // Updates PlayerX on keypress
+            users[clientIndex][1] = playerX[clientIndex]; // Updates users array with new X coordinate (same value as in PlayerX)
+			Player.Move(new THREE.Vector3(-1,0,0));
+        } else if (keyStroke == 37) { // right
+            playerX[clientIndex]=playerX[clientIndex]-1; // Updates PlayerX on keypress
+            users[clientIndex][1] = playerX[clientIndex]; // Updates users array with new X coordinate (same value as in PlayerX)	
+			Player.Move(new THREE.Vector3(-1,0,0));
+        }
+        if (keyStroke == 40) { // up
+            playerY[clientIndex]=playerY[clientIndex]+1; // Updates PlayerY on keypress
+            users[clientIndex][2] = playerY[clientIndex]; // Updates users array with new Y coordinate (same value as in PlayerY)
+			Player.Move(new THREE.Vector3(0,1,0));
+        } else if (keyStroke == 38) { // down
+            playerY[clientIndex]=playerY[clientIndex]-1; // Updates PlayerY on keypress
+            users[clientIndex][2] = playerY[clientIndex]; // Updates users array with new Y coordinate (same value as in PlayerY)
+			Player.Move(new THREE.Vector3(0,-1,0));
+        }
+	}	
+</script>
+</body>
+</html>

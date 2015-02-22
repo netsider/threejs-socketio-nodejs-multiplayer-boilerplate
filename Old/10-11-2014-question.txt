@@ -1,0 +1,17 @@
+I was toying with socket.io, ThreeJS, Javascript, and NodeJS to create a simple client/server using ThreeJS's graphics.  I wasn't sure if all of these frameworks would even work together, but I decided to give it a shot since I've seen similar examples online before even though I cannot find a simple one to dissect or experiment with.  It's mainly to experiment with, but I also wanted to make a small little concept-game as proof of what I've learned so far.
+
+I posted my code here:  https://gist.github.com/netsider/63c414d83bd806b4e7eb
+
+Sorry if it's a little untidy, but I did my best to make it as readable as possible.
+
+Basically, right now the server-side NodeJS script seems to run fine (Run with "node server-alpha.js"), and the client script (client-alpha.html, which you can just open in a browser) connects to the server, and displays a list of users (who are also connected).  However, my intention was for each user to be able to move his/her own cube around, and right now each cube only gets added to the screen (rather than being added, subtracted, and then added again - to give the illusion of movement).  If you run both pieces of code and connected one or two users and move the arrow keys a few times for each, you'll see what I'm talking about. 
+
+Can anybody help me with this?  I tried several different ways to remove the cube (and remembered to call render(), after each)... but everything I tried didn't seem to work.  It always resulted in the cubes just being added to the screen, and never subtracted.
+
+I added comments in the code to make things a little easier, as I know this is quite a bit of code to go through (if it's not your own, anyway).  
+
+Thanks, any help would be greatly appreciated... as I'm really stuck trying to make the cubes just move.
+
+Also, I'm having trouble adding the Fly-Controls (FlyControls.js - it's commented out ATM), so if someone could tell me where I went wrong I'd appreciate that a lot also.
+
+https://stackoverflow.com/questions/26312406/threejs-websockets-and-nodejs-client-server-experiment
