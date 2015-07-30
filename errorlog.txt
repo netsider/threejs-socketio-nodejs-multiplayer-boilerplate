@@ -1,0 +1,161 @@
+
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate>npm install
+-
+
+
+> utf-8-validate@1.1.0 install C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-b
+oilerplate\node_modules\socket.io\node_modules\engine.io\node_modules\ws\node_modules\utf-
+8-validate
+> node-gyp rebuild
+
+
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_modules\socket.
+io\node_modules\engine.io\node_modules\ws\node_modules\utf-8-validate>node "C:\Program Fil
+es\nodejs\node_modules\npm\bin\node-gyp-bin\\..\..\node_modules\node-gyp\bin\node-gyp.js"
+rebuild
+child_process: customFds option is deprecated, use stdio instead.
+Building the projects in this solution one at a time. To enable parallel build, please add
+ the "/m" switch.
+  validation.cc
+LINK : fatal error LNK1104: cannot open file 'libcpmt.lib' [C:\xampp5.6.11\htdocs\threejs
+-socketio-nodejs-multiplayer-boilerplate\node_modules\socket.io\node_modules\engine.io\no
+de_modules\ws\node_modules\utf-8-validate\build\validation.vcxproj]
+gyp ERR! build error
+gyp ERR! stack Error: `C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe` failed with ex
+it code: 1
+gyp ERR! stack     at ChildProcess.onExit (C:\Program Files\nodejs\node_modules\npm\node_m
+odules\node-gyp\lib\build.js:267:23)
+gyp ERR! stack     at ChildProcess.emit (events.js:110:17)
+gyp ERR! stack     at Process.ChildProcess._handle.onexit (child_process.js:1067:12)
+gyp ERR! System Windows_NT 6.3.9600
+gyp ERR! command "node" "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-
+gyp\\bin\\node-gyp.js" "rebuild"
+gyp ERR! cwd C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_mo
+dules\socket.io\node_modules\engine.io\node_modules\ws\node_modules\utf-8-validate
+gyp ERR! node -v v0.12.1
+gyp ERR! node-gyp -v v1.0.2
+gyp ERR! not ok
+
+> bufferutil@1.1.0 install C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boile
+rplate\node_modules\socket.io\node_modules\engine.io\node_modules\ws\node_modules\bufferut
+il
+> node-gyp rebuild
+
+
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_modules\socket.
+io\node_modules\engine.io\node_modules\ws\node_modules\bufferutil>node "C:\Program Files\n
+odejs\node_modules\npm\bin\node-gyp-bin\\..\..\node_modules\node-gyp\bin\node-gyp.js" rebu
+ild
+child_process: customFds option is deprecated, use stdio instead.
+Building the projects in this solution one at a time. To enable parallel build, please add
+ the "/m" switch.
+  bufferutil.cc
+LINK : fatal error LNK1104: cannot open file 'libcpmt.lib' [C:\xampp5.6.11\htdocs\threejs
+-socketio-nodejs-multiplayer-boilerplate\node_modules\socket.io\node_modules\engine.io\no
+de_modules\ws\node_modules\bufferutil\build\bufferutil.vcxproj]
+gyp ERR! build error
+gyp ERR! stack Error: `C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe` failed with ex
+it code: 1
+gyp ERR! stack     at ChildProcess.onExit (C:\Program Files\nodejs\node_modules\npm\node_m
+odules\node-gyp\lib\build.js:267:23)
+gyp ERR! stack     at ChildProcess.emit (events.js:110:17)
+gyp ERR! stack     at Process.ChildProcess._handle.onexit (child_process.js:1067:12)
+gyp ERR! System Windows_NT 6.3.9600
+gyp ERR! command "node" "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-
+gyp\\bin\\node-gyp.js" "rebuild"
+gyp ERR! cwd C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_mo
+dules\socket.io\node_modules\engine.io\node_modules\ws\node_modules\bufferutil
+gyp ERR! node -v v0.12.1
+gyp ERR! node-gyp -v v1.0.2
+gyp ERR! not ok
+npm WARN optional dep failed, continuing utf-8-validate@1.1.0
+
+> bufferutil@1.1.0 install C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boile
+rplate\node_modules\socket.io\node_modules\socket.io-client\node_modules\engine.io-client\
+node_modules\ws\node_modules\bufferutil
+> node-gyp rebuild
+
+
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_modules\socket.
+io\node_modules\socket.io-client\node_modules\engine.io-client\node_modules\ws\node_module
+s\bufferutil>node "C:\Program Files\nodejs\node_modules\npm\bin\node-gyp-bin\\..\..\node_m
+odules\node-gyp\bin\node-gyp.js" rebuild
+child_process: customFds option is deprecated, use stdio instead.
+Building the projects in this solution one at a time. To enable parallel build, please add
+ the "/m" switch.
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(308,5):
+ error MSB3491: Could not write lines to file "Release\obj\bufferutil\bufferutil.tlog\buf
+ferutil.lastbuildstate". The specified path, file name, or both are too long. The fully q
+ualified file name must be less than 260 characters, and the directory name must be less
+than 248 characters. [C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerpla
+te\node_modules\socket.io\node_modules\socket.io-client\node_modules\engine.io-client\nod
+e_modules\ws\node_modules\bufferutil\build\bufferutil.vcxproj]
+gyp ERR! build error
+gyp ERR! stack Error: `C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe` failed with ex
+it code: 1
+gyp ERR! stack     at ChildProcess.onExit (C:\Program Files\nodejs\node_modules\npm\node_m
+odules\node-gyp\lib\build.js:267:23)
+gyp ERR! stack     at ChildProcess.emit (events.js:110:17)
+gyp ERR! stack     at Process.ChildProcess._handle.onexit (child_process.js:1067:12)
+gyp ERR! System Windows_NT 6.3.9600
+gyp ERR! command "node" "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-
+gyp\\bin\\node-gyp.js" "rebuild"
+gyp ERR! cwd C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_mo
+dules\socket.io\node_modules\socket.io-client\node_modules\engine.io-client\node_modules\w
+s\node_modules\bufferutil
+gyp ERR! node -v v0.12.1
+gyp ERR! node-gyp -v v1.0.2
+gyp ERR! not ok
+npm WARN optional dep failed, continuing bufferutil@1.1.0
+
+> utf-8-validate@1.1.0 install C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-b
+oilerplate\node_modules\socket.io\node_modules\socket.io-client\node_modules\engine.io-cli
+ent\node_modules\ws\node_modules\utf-8-validate
+> node-gyp rebuild
+
+
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_modules\socket.
+io\node_modules\socket.io-client\node_modules\engine.io-client\node_modules\ws\node_module
+s\utf-8-validate>node "C:\Program Files\nodejs\node_modules\npm\bin\node-gyp-bin\\..\..\no
+de_modules\node-gyp\bin\node-gyp.js" rebuild
+child_process: customFds option is deprecated, use stdio instead.
+Building the projects in this solution one at a time. To enable parallel build, please add
+ the "/m" switch.
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(308,5):
+ error MSB3491: Could not write lines to file "Release\obj\validation\validation.tlog\val
+idation.lastbuildstate". The specified path, file name, or both are too long. The fully q
+ualified file name must be less than 260 characters, and the directory name must be less
+than 248 characters. [C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerpla
+te\node_modules\socket.io\node_modules\socket.io-client\node_modules\engine.io-client\nod
+e_modules\ws\node_modules\utf-8-validate\build\validation.vcxproj]
+gyp ERR! build error
+gyp ERR! stack Error: `C:\Program Files (x86)\MSBuild\14.0\bin\msbuild.exe` failed with ex
+it code: 1
+gyp ERR! stack     at ChildProcess.onExit (C:\Program Files\nodejs\node_modules\npm\node_m
+odules\node-gyp\lib\build.js:267:23)
+gyp ERR! stack     at ChildProcess.emit (events.js:110:17)
+gyp ERR! stack     at Process.ChildProcess._handle.onexit (child_process.js:1067:12)
+gyp ERR! System Windows_NT 6.3.9600
+gyp ERR! command "node" "C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-
+gyp\\bin\\node-gyp.js" "rebuild"
+gyp ERR! cwd C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate\node_mo
+dules\socket.io\node_modules\socket.io-client\node_modules\engine.io-client\node_modules\w
+s\node_modules\utf-8-validate
+gyp ERR! node -v v0.12.1
+gyp ERR! node-gyp -v v1.0.2
+gyp ERR! not ok
+npm WARN optional dep failed, continuing bufferutil@1.1.0
+npm WARN optional dep failed, continuing utf-8-validate@1.1.0
+socket.io@1.3.6 node_modules\socket.io
+├── has-binary-data@0.1.3 (isarray@0.0.1)
+├── debug@2.1.0 (ms@0.6.2)
+├── socket.io-parser@2.2.4 (isarray@0.0.1, debug@0.7.4, component-emitter@1.1.2, benchmark
+@1.0.0, json3@3.2.6)
+├── socket.io-adapter@0.3.1 (object-keys@1.0.1, debug@1.0.2, socket.io-parser@2.2.2)
+├── engine.io@1.5.2 (base64id@0.1.0, debug@1.0.3, engine.io-parser@1.2.1, ws@0.7.2)
+└── socket.io-client@1.3.6 (to-array@0.1.3, indexof@0.0.1, component-bind@1.0.0, debug@0.7
+.4, object-component@0.0.3, backo2@1.0.2, component-emitter@1.1.2, has-binary@0.1.6, parse
+uri@0.0.2, engine.io-client@1.5.2)
+
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate>
+C:\xampp5.6.11\htdocs\threejs-socketio-nodejs-multiplayer-boilerplate>^A
