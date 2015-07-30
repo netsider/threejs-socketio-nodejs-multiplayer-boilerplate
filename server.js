@@ -1,3 +1,4 @@
+var port = 8080;
 console.log("Server started on port: " + port);
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
