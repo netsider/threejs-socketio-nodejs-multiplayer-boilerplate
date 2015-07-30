@@ -1,11 +1,11 @@
 <html lang="en">
-		<meta charset="UTF-8">
+		<meta charset="UTF-8" />
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>	
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script> 
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script> 
 		<script src="http://cdn.socket.io/socket.io-1.0.0.js"></script> 
-		<script src="FlyControls.js"></script>
+		<!-- <script src="FlyControls.js"></script> -->
 <body>
  <div id="signin" style="right: 100px;width:20%; margin:30px;position: fixed;background-color: white;opacity: 0.5;">
 		<h1>Please enter your name</h1>
@@ -13,7 +13,7 @@
 		<button value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();'>Start</button>
 </div>
 <div id="userhead" style="left:100px; width:20%; margin:30px;position: fixed;background-color: white;"><h1>User List</h1><hr>
-	<div id="userlist" style=""></div> 
+	<div id="userlist"></div> 
 </div>
 <script>
 	var renderer;

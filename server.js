@@ -1,10 +1,9 @@
-console.log("Server Started....");
+console.log("Server started on port: " + port);
 var app = require('http').createServer(handler)
   , io = require('socket.io').listen(app)
   , fs = require('fs')
-
 var users = Array();
-app.listen(8080);
+app.listen(port);
 function handler (req, res) {
   fs.readFile(__dirname + '/client.html',
   function (err, data) {
@@ -18,7 +17,6 @@ function handler (req, res) {
 } 
 io.sockets.on('connection', function (socket) {
 console.log("connection()");
-
   socket.on('setname', function(userName) {   
 	console.log("setname(userName)");
 	console.log(users); // Logs the users to the console whenever new player joins
@@ -30,12 +28,10 @@ console.log("connection()");
     io.sockets.emit('getplayers', users);  
     io.sockets.emit('playermove', '45', usernumber); // To update without keypress on client
   });
-
   socket.on('syncplayers', function(user) { 
 	console.log("syncplayers(user)");  
     users = user;  
   });
-
   socket.on('keypress', function (data) {
   console.log("keypress(data)");
     io.sockets.emit('playermove', data[0], data[1]);  
