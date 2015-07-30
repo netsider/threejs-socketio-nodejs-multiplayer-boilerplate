@@ -9,8 +9,8 @@
 <body>
  <div id="signin" style="right: 100px;width:20%; margin:30px;position: fixed;background-color: white;opacity: 0.5;">
 		<h1>Please enter your name</h1>
-		<input type='text' id='userNameField'>
-		<button value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();'>Start</button>
+		<input type='text' id='userNameField' />
+		<input type="submit" value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();' />
 </div>
 <div id="userhead" style="left:100px; width:20%; margin:30px;position: fixed;background-color: white;"><h1>User List</h1><hr>
 	<div id="userlist"></div> 
@@ -50,19 +50,7 @@
         render();
     }
 	
-	function make(playerX, playerY, playerZ = 15){
-		//console.log("getplayer()");
-		scene.remove(cube);
-		render();
-        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-        var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
-        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-		cube.position.x = playerX;
-        cube.position.y = playerY;
-        cube.position.z = 20;
-		 scene.add(cube);
-		 render();
-	}
+
     
 	// Controls & GUI
 	//controls = new THREE.FlyControls( camera ); // This messes everything up
@@ -198,6 +186,20 @@
 		//playerY[i] = users[i][2];
 		make(playerX[i], playerY[i], 20);
 	 	}        
+	}
+	
+	function make(playerX, playerY, playerZ){
+		//console.log("getplayer()");
+		scene.remove(cube);
+		render();
+        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+        var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
+        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+		cube.position.x = playerX;
+        cube.position.y = playerY;
+        cube.position.z = 20;
+		 scene.add(cube);
+		 render();
 	}	
 </script>
 </body>
