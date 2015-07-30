@@ -1,0 +1,24 @@
+{
+  "name": "threejs-socketio-nodejs-multiplayer-boilerplate",
+  "version": "1.0.0",
+  "description": "Multiplayer Node/Socket.io/Three.js\r ==========\r 1. Install Node.js\r 2. Install Socket.io \r 3. Run \"node server.js\".\r 5. Go to 'http://localhost:8080' or equivalent.",
+  "main": "server.js",
+  "dependencies": {
+    "socket.io": "^1.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/netsider/threejs-socketio-nodejs-multiplayer-boilerplate.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/netsider/threejs-socketio-nodejs-multiplayer-boilerplate/issues"
+  },
+  "homepage": "https://github.com/netsider/threejs-socketio-nodejs-multiplayer-boilerplate"
+}
