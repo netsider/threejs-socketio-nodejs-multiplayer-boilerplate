@@ -33,7 +33,7 @@
         camera.position.x = 10;
         camera.position.y = 10;
         camera.position.z = 10;
-        camera.lookAt(scene.position);
+        //camera.lookAt(scene.position);
 		
 		// Lighting
 		var ambient = new THREE.AmbientLight(0x808080);
@@ -111,6 +111,7 @@
     	}
     	$('#userlist').html('<p>'+userlist+'</p>');
 		draw(users);
+		
     });  
     
 	socket.on('syncplayers', function (user) { 
@@ -189,7 +190,11 @@
 	var l = users.length;
 	if("users" in window){
 	for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
+		if("users[i][3]" in window){
 		playerName = users[i][3];
+		}else{
+		playerName = "Default"
+		}
 		make(playerName, playerX[i], playerY[i], 20);
 	}
 	}
@@ -199,7 +204,9 @@
 	console.log("draw");
 	    var l = users.length;
 	    for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
-	 	}        
+	 	playerName = users[i][3];
+		move(playerName, playerX[i], playerY[i], 20);
+		}        
 	}
 	function make(name, playerX, playerY, playerZ){
 		console.log("make()");
@@ -212,15 +219,13 @@
 		cube.name = name;
 		console.log("cube.name: " + cube.name);
 		scene.add(cube);
+		if(cube.name == userName){
+			console.log("Cube matches usbername");
+			camera.lookAt(scene.cube.position);
+		}
 	}
 	function move(playerX, playerY, playerZ){
 		console.log("move()");
-        var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-        var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
-        var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-		cube.position.x = playerX;
-        cube.position.y = playerY;
-        cube.position.z = 20;
 	}		
 	function callToRender(){
 		render();
