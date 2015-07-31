@@ -201,6 +201,7 @@
 		make(playerName, playerX[i], playerY[i], 20);
 	}
 	}
+	callToRender();
 	}
 	function translate(user) {
 	users = user; // passing to global browser users
@@ -224,12 +225,15 @@
 		scene.add(cube);
 		if(cube.name == userName){
 			console.log("Cube matches usbername, playerObject set");
-			var playerObject = scene.getObjectByName(userName);
+			playerObject = scene.getObjectByName(userName);
 			cube.add(camera);
 		}
 	}
-	function move(playerX, playerY, playerZ){
+	function move(name, playerX, playerY, playerZ){
 		console.log("move()");
+		var player = playerObject;
+		player.translateX(playerX);
+		player.translateY(playerY);
 	}		
 	function callToRender(){
 		render();
