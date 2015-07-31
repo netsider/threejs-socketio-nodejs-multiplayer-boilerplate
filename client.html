@@ -136,14 +136,17 @@
 
 	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
 		console.log("playermove()");
+		if("users" in window){
 		console.log(JSON.stringify(users)); // Displays list of users
 		movePlayer(keystroke,clientIndex);
-		socketResponse("syncplayers", users); 
+		socketResponse("syncplayers", users);
+		}
     }); 
 	
 	addEventListener('keydown', function(e) { // [1] // Calls Server-keypress()
 	console.log("keydown()");
-    	if (users.length > 0) { // If users not empty
+    	if("users" in window){
+		if (users.length > 0) { // If users not empty
 	    	var l = users.length; // Loop the length of users array/object
 	    	for (var i = 0; i < l; i++) {
 	    		if (users[i][3] == userName) { // If current user in array equals userName
@@ -151,6 +154,7 @@
 	    		}
 	    	}
     	}
+		}
     	var clientData = new Array();
     	clientData[0] = e.keyCode;
     	clientData[1] = clientid; 
@@ -179,29 +183,27 @@
 		callToRender();
 	}
 
-	function draw(user) {
+	function draw(user) { // initial draw
 	users = user; // passing to global browser users
-	console.log("draw");
-	//console.log(users);
-	    var l = users.length;
-	    for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
-		//playerX[i] = users[i][1];
-		//playerY[i] = users[i][2];
-		make(playerX[i], playerY[i], 20);
-	 	}        
+	console.log("drawing initial users");
+	var l = users.length;
+	for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
+		if("users" in window){
+			playerName = users[i][3];
+		}else{
+			playerName = 'XXX';
+		}
+		make(playerName, playerX[i], playerY[i], 20);
+		}        
 	}
 	function translate(user) {
 	users = user; // passing to global browser users
 	console.log("draw");
-	//console.log(users);
 	    var l = users.length;
 	    for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
-		//playerX[i] = users[i][1];
-		//playerY[i] = users[i][2];
-		make(playerX[i], playerY[i], 20);
 	 	}        
 	}
-	function make(playerX, playerY, playerZ){
+	function make(name, playerX, playerY, playerZ){
 		console.log("make()");
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
         var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
@@ -209,9 +211,9 @@
 		cube.position.x = playerX;
         cube.position.y = playerY;
         cube.position.z = 20;
-		if(true){
+		cube.name = name;
+		console.log("cube.name: " + cube.name);
 		scene.add(cube);
-		}
 	}
 	function move(playerX, playerY, playerZ){
 		console.log("move()");
