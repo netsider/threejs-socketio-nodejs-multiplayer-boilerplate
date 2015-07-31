@@ -187,14 +187,12 @@
 	users = user; // passing to global browser users
 	console.log("drawing initial users");
 	var l = users.length;
+	if("users" in window){
 	for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
-		if("users" in window){
-			playerName = users[i][3];
-		}else{
-			playerName = 'XXX';
-		}
+		playerName = users[i][3];
 		make(playerName, playerX[i], playerY[i], 20);
-		}        
+	}
+	}
 	}
 	function translate(user) {
 	users = user; // passing to global browser users
