@@ -110,6 +110,7 @@
 			playerY[i] = user[i][2]; // Get Y coordinate of User
     	}
     	$('#userlist').html('<p>'+userlist+'</p>');
+		draw(users);
     });  
     
 	socket.on('syncplayers', function (user) { 
@@ -175,7 +176,6 @@
             playerY[clientIndex]=playerY[clientIndex]-1;
             users[clientIndex][2] = playerY[clientIndex];
         }
-		draw(users);
 		callToRender();
 	}
 
