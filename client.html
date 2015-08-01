@@ -31,9 +31,6 @@
         renderer.setClearColor(0x000000, 1.0);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
-        //camera.position.x = 10;
-        //camera.position.y = 10;
-        //camera.position.z = 10;
         camera.lookAt(scene.position);
 		
 		// Lighting
@@ -142,7 +139,6 @@
 		console.log(JSON.stringify(users)); // Displays list of users
 		movePlayer(keystroke,clientIndex);
 		socketResponse("syncplayers", users);
-		render();
 		}
     }); 
 	
@@ -184,7 +180,6 @@
             users[clientIndex][2] = playerY[clientIndex];
         }
 		translate(users);
-		//render();
 	}
 
 	function draw(user) { // initial draw
@@ -202,7 +197,6 @@
 		make(playerName, playerX[i], playerY[i], 20);
 	}
 	}
-	//render();
 	}
 	function translate(user) {
 	console.log("Attempting to translate user positions...");
@@ -216,7 +210,6 @@
 		move(playerName, playerX[i], playerY[i], 20);
 		}
 		}
-		//render();
 	}
 	function make(name, playerX, playerY, playerZ){
 		console.log("make() called.");
@@ -230,11 +223,11 @@
 		console.log("cube.name: " + cube.name);
 		scene.add(cube);
 		if(cube.name == userName){
-		console.log("Cube matches usbername, playerObject set");
-		playerObject = scene.getObjectByName(userName);
-		//playerObject.add(camera);
-		camera.lookAt(playerObject.position);
+			console.log("Cube matches usbername, playerObject set");
+			playerObject = scene.getObjectByName(userName);
+			camera.lookAt(playerObject.position); // look at player
 		}
+		render();
 	}
 	function move(name, playerX, playerY, playerZ){
 		console.log("move()");
@@ -243,12 +236,6 @@
 		if("player" in window){
 		player.translateX(playerX);
 		player.translateY(playerY);
-		camera.lookAt(player);
-		//if(player.name == userName){
-		//	console.log("Cube matches usbername, playerObject set");
-		//	playerObject = scene.getObjectByName(userName);
-		//	playerObject.add(camera);
-		//}
 		}
 	}
 </script>
