@@ -69,9 +69,10 @@
     }
 
     function render() {
-        var rotSpeed = control.rotationSpeed;
-        //camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
-        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
+        //var rotSpeed = control.rotationSpeed;
+        var rotSpeed = 0.5;
+        camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
+        camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
         
 		//camera.lookAt(scene.position); // Rotate Camera by using the 3 preceeding lines of code.
 		
@@ -141,6 +142,7 @@
 		console.log(JSON.stringify(users)); // Displays list of users
 		movePlayer(keystroke,clientIndex);
 		socketResponse("syncplayers", users);
+		render();
 		}
     }); 
 	
@@ -182,7 +184,7 @@
             users[clientIndex][2] = playerY[clientIndex];
         }
 		translate(users);
-		render();
+		//render();
 	}
 
 	function draw(user) { // initial draw
@@ -200,11 +202,12 @@
 		make(playerName, playerX[i], playerY[i], 20);
 	}
 	}
+	//render();
 	}
 	function translate(user) {
 	console.log("Attempting to translate user positions...");
 	users = user; // passing to global browser users
-	console.log("users: " + users);
+	console.log("translating users: " + users);
 	    //var l = users.length;
 		var l = (users.length) - 1;
 	    for (var i = 0; i <= l; i++) { // loop that translates all users on each pass
@@ -213,6 +216,7 @@
 		move(playerName, playerX[i], playerY[i], 20);
 		}
 		}
+		//render();
 	}
 	function make(name, playerX, playerY, playerZ){
 		console.log("make() called.");
@@ -239,11 +243,12 @@
 		if("player" in window){
 		player.translateX(playerX);
 		player.translateY(playerY);
-		if(player.name == userName){
-			console.log("Cube matches usbername, playerObject set");
-			playerObject = scene.getObjectByName(userName);
-			playerObject.add(camera);
-		}
+		camera.lookAt(player);
+		//if(player.name == userName){
+		//	console.log("Cube matches usbername, playerObject set");
+		//	playerObject = scene.getObjectByName(userName);
+		//	playerObject.add(camera);
+		//}
 		}
 	}
 </script>
