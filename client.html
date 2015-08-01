@@ -144,7 +144,7 @@
 		}
     }); 
 	
-	addEventListener('keydown', function(e) { // [1] // Calls Server-keypress()
+	addEventListener('keydown', function(e) { // [1] // Calls keypress() in server.js
 	console.log("keydown()");
     	if("users" in window){
 		if (users.length > 0) { // If users not empty
@@ -157,16 +157,16 @@
     	}
 		}
     	var clientData = new Array();
-    	clientData[0] = e.keyCode;
-    	clientData[1] = clientid; 
+    	clientData[0] = e.keyCode; // code of key pressed
+    	clientData[1] = clientid;  // position of "userName" in array "users"
 		//console.log(JSON.stringify(clientData));
     	socketResponse('keypress',clientData); 
 	}, false);   
 	
 	function movePlayer(keyStroke, clientIndex) {	//[3]
 		console.log("movePlayer()");
-		//console.log(JSON.stringify(clientIndex));
-		//console.log(JSON.stringify(keyStroke));		
+		console.log(JSON.stringify(clientIndex));
+		console.log(JSON.stringify(keyStroke));		
         if (keyStroke == 39) { // left
             playerX[clientIndex]=playerX[clientIndex]+1;
             users[clientIndex][1] = playerX[clientIndex];
@@ -182,16 +182,17 @@
             users[clientIndex][2] = playerY[clientIndex];
         }
 		translate(users);
-		//render();
+		render();
 	}
 
 	function draw(user) { // initial draw
-	users = user; // passing to global browser users
+	//users = user; // passing to global browser users
 	console.log("Drawing initial users");
-	var l = users.length;
+	var l = (users.length) - 1;
 	if("users" in window){
 	for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
 		if("users" in window){
+		console.log(JSON.stringify(users));
 		playerName = users[i][3];
 		}else{
 		playerName = "Default"
@@ -204,11 +205,14 @@
 	console.log("Attempting to translate user positions...");
 	users = user; // passing to global browser users
 	console.log("users: " + users);
-	    var l = users.length;
+	    //var l = users.length;
+		var l = (users.length) - 1;
 	    for (var i = 0; i <= l; i++) { // loop that translates all users on each pass
+		if("users" in window){
 		playerName = users[i][3];
 		move(playerName, playerX[i], playerY[i], 20);
-		}        
+		}
+		}
 	}
 	function make(name, playerX, playerY, playerZ){
 		console.log("make() called.");
