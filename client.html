@@ -66,14 +66,14 @@
     }
 
     function render() {
-		var playerObject = scene.getObjectByName(userName);
+		
         //console.log("render");
 		//var rotSpeed = control.rotationSpeed;
-        var rotSpeed = 0.001;
         //camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
         //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
         //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
-        //camera.lookAt(playerObject.position); // Rotate Camera by using the 3 preceeding lines of code.
+        var playerObject = scene.getObjectByName(userName);
+		camera.lookAt(playerObject.position);
 		
         // render using requestAnimationFrame
         requestAnimationFrame(render);
@@ -94,24 +94,22 @@
 	var userlist = '';
 	var usernumber; 
 	var clientid = new Array();
-	var isCreated = new Array();
-	var anotherUserList = new Array();
 	var playerNames = new Array();
     
-	socket.on('getplayers', function (user) { // Takes parameter, and uses jquery to output list of third item of each array item.  Called by the setname() server function when submit button is pressee
-	console.log("getplayers(user)");
-	//console.log(JSON.stringify(user)); // Returns list of users
-    	users = user; 
+	socket.on('getplayers', function (user) { // Called by the setname() server function after submit button is pressed
+		users = user; 
+		console.log("getplayers(user)");
+		console.log("user: " + JSON.stringify(user)); // Returns list of users
     	userlist = '';
-    	var l = users.length;
+    	var l = user.length;
 	    for (var i = 0; i < l; i++) { 		 
 	    	userlist += user[i][3]+'<br>';  // Add each user name to userlist
     		playerX[i] = user[i][1]; // Get X coordinate of User
 			playerY[i] = user[i][2]; // Get Y coordinate of User
-			playerNames[i] = user[i][3];
+			//playerNames[i] = user[i][3];
     	}
     	$('#userlist').html('<p>'+userlist+'</p>');
-		draw(users);
+		draw(user);
     });  
     
 	socket.on('syncplayers', function (user) { 
@@ -124,9 +122,8 @@
 		for (var i = 0; i < l; i++) { // Loops through all the users in users
 				playerX[i] = user[i][1];
 				playerY[i] = user[i][2];
-				playerNames[i] = user[i][3];
 				usernumber = users.length;  
-				users[usernumber][1] = playerX[i]; // Gets last users X value ?
+				users[usernumber][1] = playerX[i];
 				users[usernumber][2] = playerY[i];
 		}
     });
@@ -139,9 +136,9 @@
 	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
 		console.log("playermove()");
 		if("users" in window){
-		console.log(JSON.stringify(users)); // Displays list of users
-		movePlayer(keystroke,clientIndex);
-		socketResponse("syncplayers", users);
+			console.log(JSON.stringify(users)); // Displays list of users
+			movePlayer(keystroke,clientIndex);
+			socketResponse("syncplayers", users);
 		}
     }); 
 	
@@ -190,30 +187,24 @@
 	if("users" in window){
 	for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
 		if("users" in window){
-		console.log(JSON.stringify(users));
-		playerName = users[i][3];
+			console.log(JSON.stringify(users));
+			playerName = users[i][3];
 		}
-		make(playerName, playerX[i], playerY[i], 20);
+		console.log("Indexof: " + playerNames.contains(userName));
+		//!playerNames.contains(userName)
+		if(!scene.getObjectByName(playerNames[i])){ // create player if doesn't exist
+			make(playerName, playerX[i], playerY[i], 20);
+			playerNames.push(user[i][3]);
+		}
 	}
 	}
-	}
-	function translate(user) {
-	console.log("Attempting to translate user positions...");
-	users = user;
-	console.log("translating users: " + users);
-	    //var l = users.length;
-		var l = (users.length) - 1;
-	    for (var i = 0; i <= l; i++) { // loop that translates all users on each pass
-		if("users" in window){
-		playerName = users[i][3];
-		move(playerName, playerX[i], playerY[i], 20);
-		}
-		}
 	}
 	function make(name, playerX, playerY, playerZ){
 		console.log("make() called.");
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-        var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
+        colors = ["red", "blue", "green", "yellow"];
+		
+		var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 		cube.position.x = playerX;
         cube.position.y = playerY;
@@ -222,7 +213,7 @@
 		console.log("cube.name: " + cube.name);
 		scene.add(cube);
 		if(cube.name == userName){
-			console.log("Cube matches usbername, playerObject set");
+			console.log("Cube matches username, playerObject set");
 			playerObject = scene.getObjectByName(userName);
 			scene.player = playerObject;
 			camera.lookAt(playerObject.position); // look at player
@@ -245,6 +236,12 @@
 		player.position.x = X;
 		player.position.y = Y;
 	}
+Array.prototype.contains = function ( needle ) {
+   for (i in this) {
+       if (this[i] == needle) return true;
+   }
+   return false;
+}
 </script>
 </body>
 </html>
