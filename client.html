@@ -16,6 +16,7 @@
 	<div id="userlist"></div> 
 </div>
 <script>
+	var Debug = true;
 	var renderer;
     var scene;
     var camera;
@@ -31,7 +32,6 @@
         renderer.setClearColor(0x000000, 1.0);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
-        camera.lookAt(scene.position);
 		
 		// Lighting
 		var ambient = new THREE.AmbientLight(0x808080);
@@ -66,12 +66,14 @@
     }
 
     function render() {
-        //var rotSpeed = control.rotationSpeed;
-        var rotSpeed = 0.5;
-        camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
-        camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
-        
-		//camera.lookAt(scene.position); // Rotate Camera by using the 3 preceeding lines of code.
+		var playerObject = scene.getObjectByName(userName);
+        //console.log("render");
+		//var rotSpeed = control.rotationSpeed;
+        var rotSpeed = 0.001;
+        //camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
+        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
+        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
+        //camera.lookAt(playerObject.position); // Rotate Camera by using the 3 preceeding lines of code.
 		
         // render using requestAnimationFrame
         requestAnimationFrame(render);
@@ -94,38 +96,39 @@
 	var clientid = new Array();
 	var isCreated = new Array();
 	var anotherUserList = new Array();
+	var playerNames = new Array();
     
 	socket.on('getplayers', function (user) { // Takes parameter, and uses jquery to output list of third item of each array item.  Called by the setname() server function when submit button is pressee
 	console.log("getplayers(user)");
 	//console.log(JSON.stringify(user)); // Returns list of users
     	users = user; 
     	userlist = '';
-    	var l = user.length;
+    	var l = users.length;
 	    for (var i = 0; i < l; i++) { 		 
 	    	userlist += user[i][3]+'<br>';  // Add each user name to userlist
-	    	isCreated[i] += user[i][3];
-	    	anotherUserList[i] += user[i][3];
     		playerX[i] = user[i][1]; // Get X coordinate of User
 			playerY[i] = user[i][2]; // Get Y coordinate of User
+			playerNames[i] = user[i][3];
     	}
     	$('#userlist').html('<p>'+userlist+'</p>');
 		draw(users);
     });  
     
 	socket.on('syncplayers', function (user) { 
-	console.log("syncplayers(user)");
-	//console.log(JSON.stringify(user));// Returns list of users
-	//console.log(JSON.stringify(users));// Also Returns list of users (?)
-	socketResponse("syncplayers", users);
-	users = user; // passing to global browser users
-   	var l = user.length; 
-	   for (var i = 0; i < l; i++) { // Loops through all the users in users
-    		playerX[i] = user[i][1];
-			playerY[i] = user[i][2];
-			usernumber = users.length;  
-		    users[usernumber][1] = playerX[i]; // Gets last users X value ?
-		    users[usernumber][2] = playerY[i];  
-    	}
+		console.log("syncplayers(user)");
+		//console.log(JSON.stringify(user));// Returns list of users
+		//console.log(JSON.stringify(users));// Also Returns list of users (?)
+		socketResponse("syncplayers", users);
+		users = user; // passing to global browser users
+		var l = users.length - 1; 
+		for (var i = 0; i < l; i++) { // Loops through all the users in users
+				playerX[i] = user[i][1];
+				playerY[i] = user[i][2];
+				playerNames[i] = user[i][3];
+				usernumber = users.length;  
+				users[usernumber][1] = playerX[i]; // Gets last users X value ?
+				users[usernumber][2] = playerY[i];
+		}
     });
 
     function socketResponse(type, data) {
@@ -163,8 +166,8 @@
 	
 	function movePlayer(keyStroke, clientIndex) {	//[3]
 		console.log("movePlayer()");
-		console.log(JSON.stringify(clientIndex));
-		console.log(JSON.stringify(keyStroke));		
+		console.log("clientIndex: " + JSON.stringify(clientIndex));
+		console.log("keyStroke: " + JSON.stringify(keyStroke));		
         if (keyStroke == 39) { // left
             playerX[clientIndex]=playerX[clientIndex]+1;
             users[clientIndex][1] = playerX[clientIndex];
@@ -179,11 +182,9 @@
             playerY[clientIndex]=playerY[clientIndex]-1;
             users[clientIndex][2] = playerY[clientIndex];
         }
-		translate(users);
+		move_individual(clientIndex);
 	}
-
 	function draw(user) { // initial draw
-	//users = user; // passing to global browser users
 	console.log("Drawing initial users");
 	var l = (users.length) - 1;
 	if("users" in window){
@@ -191,8 +192,6 @@
 		if("users" in window){
 		console.log(JSON.stringify(users));
 		playerName = users[i][3];
-		}else{
-		playerName = "Default"
 		}
 		make(playerName, playerX[i], playerY[i], 20);
 	}
@@ -200,7 +199,7 @@
 	}
 	function translate(user) {
 	console.log("Attempting to translate user positions...");
-	users = user; // passing to global browser users
+	users = user;
 	console.log("translating users: " + users);
 	    //var l = users.length;
 		var l = (users.length) - 1;
@@ -225,18 +224,26 @@
 		if(cube.name == userName){
 			console.log("Cube matches usbername, playerObject set");
 			playerObject = scene.getObjectByName(userName);
+			scene.player = playerObject;
 			camera.lookAt(playerObject.position); // look at player
 		}
-		render();
 	}
-	function move(name, playerX, playerY, playerZ){
-		console.log("move()");
-		var playerObject = scene.getObjectByName(userName);
+	function move_individual(clientindex){
+		console.log("move_individual()");
+		var playerObject = scene.getObjectByName(playerNames[clientindex]);
 		var player = playerObject;
-		if("player" in window){
-		player.translateX(playerX);
-		player.translateY(playerY);
+		var X = playerX[clientindex];
+		var Y = playerY[clientindex];
+		if(Debug){
+			console.log("player: " + player);
+			console.log("player.name: " + player.name);
+			console.log("player.position.x: " + player.position.x);
+			console.log("player.position.y: " + player.position.y);
+			console.log("X: " + X);
+			console.log("Y: " + Y);
 		}
+		player.position.x = X;
+		player.position.y = Y;
 	}
 </script>
 </body>
