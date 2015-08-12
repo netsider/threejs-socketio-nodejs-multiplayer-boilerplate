@@ -24,59 +24,30 @@
 	var userName = '';
 	$('#userlist').html("<p>"+cpath+"</p>"); // Prints current name to userlist (before it's populated on sign-in)
     function init() {
-		//Scene Setup
         scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-		//camera.position.set(0, -10, 10);
         renderer = new THREE.WebGLRenderer();
         renderer.setClearColor(0x000000, 1.0);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
 		
 		// Lighting
-		var ambient = new THREE.AmbientLight(0x808080);
-		scene.add(ambient);
+		var ambientLight = new THREE.AmbientLight(0x808080);
+		scene.add(ambientLight);
         var spotLight = new THREE.SpotLight(0xffffff);
         spotLight.position.set(10, 20, 20);
         spotLight.shadowCameraNear = 20;
         spotLight.shadowCameraFar = 50;
         spotLight.castShadow = true;
         scene.add(spotLight);
-        document.body.appendChild(renderer.domElement);  // add the output of the renderer to the html element
-		addControlGui(control);
-        addStatsObject();
+        document.body.appendChild(renderer.domElement);  // add the output of the renderer to the DOM
         render();
-    }    
-	// Controls & GUI
-	//controls = new THREE.FlyControls( camera ); // This messes everything up
-	control = new function () { // Values for dat.gui framework (below this)
-        this.rotationSpeed = 0.001;
-    };
-	function addControlGui(controlObject) { // Code for the dat.gui framework
-        //var gui = new dat.GUI();
-        //gui.add(controlObject, 'rotationSpeed', -0.01, 0.01);
     }
-    function addStatsObject() { // Code for the Stats.js framework
-        //stats = new Stats();
-        //stats.setMode(0);
-        //stats.domElement.style.position = 'absolute';
-        //stats.domElement.style.left = '0px';
-        //stats.domElement.style.top = '0px';
-        //document.body.appendChild(stats.domElement);
-    }
-
     function render() {
-		
         //console.log("render");
-		//var rotSpeed = control.rotationSpeed;
-        //camera.position.x = camera.position.x * Math.cos(rotSpeed) + camera.position.z * Math.sin(rotSpeed);
-        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
-        //camera.position.z = camera.position.z * Math.cos(rotSpeed) - camera.position.x * Math.sin(rotSpeed);
         var playerObject = scene.getObjectByName(userName);
 		camera.lookAt(playerObject.position);
-		
-        // render using requestAnimationFrame
-        requestAnimationFrame(render);
+        requestAnimationFrame(render); // render using requestAnimationFrame
         renderer.render(scene, camera);
     }
     function handleResize() {
@@ -95,7 +66,8 @@
 	var usernumber; 
 	var clientid = new Array();
 	var playerNames = new Array();
-    
+	var colors = new Array();
+    colors = ["red", "blue", "green", "yellow", "red", "blue", "green", "yellow", "red", "blue", "green", "yellow", "red", "blue", "green", "yellow", "red", "blue", "green", "yellow"];
 	socket.on('getplayers', function (user) { // Called by the setname() server function after submit button is pressed
 		users = user; 
 		console.log("getplayers(user)");
@@ -136,7 +108,7 @@
 	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
 		console.log("playermove()");
 		if("users" in window){
-			console.log(JSON.stringify(users)); // Displays list of users
+			//console.log(JSON.stringify(users)); // Displays list of users
 			movePlayer(keystroke,clientIndex);
 			socketResponse("syncplayers", users);
 		}
@@ -185,12 +157,12 @@
 	console.log("Drawing initial users");
 	var l = (users.length) - 1;
 	if("users" in window){
-	for (var i = 0; i <= l; i++) { // loop that draws all users on each pass
+	for (var i = 0; i <= l; i++) { // loop that draws all users
 		if("users" in window){
 			console.log(JSON.stringify(users));
 			playerName = users[i][3];
 		}
-		console.log("Indexof: " + playerNames.contains(userName));
+		console.log("playerNames.contains(userName): " + playerNames.contains(userName));
 		//!playerNames.contains(userName)
 		if(!scene.getObjectByName(playerNames[i])){ // create player if doesn't exist
 			make(playerName, playerX[i], playerY[i], 20);
@@ -202,9 +174,10 @@
 	function make(name, playerX, playerY, playerZ){
 		console.log("make() called.");
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
-        colors = ["red", "blue", "green", "yellow"];
-		
-		var cubeMaterial = new THREE.MeshLambertMaterial({color: 'red', transparent:false, opacity:1.0});
+		var currentColor = colors[0];
+		colors.splice(0, 1);
+		console.log("colors: " + colors);
+		var cubeMaterial = new THREE.MeshPhongMaterial({color: currentColor, transparent:false, opacity:1.0});
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 		cube.position.x = playerX;
         cube.position.y = playerY;
@@ -213,7 +186,7 @@
 		console.log("cube.name: " + cube.name);
 		scene.add(cube);
 		if(cube.name == userName){
-			console.log("Cube matches username, playerObject set");
+			console.log("Cube is player's. playerObject set.");
 			playerObject = scene.getObjectByName(userName);
 			scene.player = playerObject;
 			camera.lookAt(playerObject.position); // look at player
@@ -221,20 +194,19 @@
 	}
 	function move_individual(clientindex){
 		console.log("move_individual()");
-		var playerObject = scene.getObjectByName(playerNames[clientindex]);
-		var player = playerObject;
+		var selectedPlayer = scene.getObjectByName(playerNames[clientindex]);
 		var X = playerX[clientindex];
 		var Y = playerY[clientindex];
 		if(Debug){
-			console.log("player: " + player);
-			console.log("player.name: " + player.name);
-			console.log("player.position.x: " + player.position.x);
-			console.log("player.position.y: " + player.position.y);
+			console.log("player: " + selectedPlayer);
+			console.log("player.name: " + selectedPlayer.name);
+			console.log("player.position.x: " + selectedPlayer.position.x);
+			console.log("player.position.y: " + selectedPlayer.position.y);
 			console.log("X: " + X);
 			console.log("Y: " + Y);
 		}
-		player.position.x = X;
-		player.position.y = Y;
+		selectedPlayer.position.x = X;
+		selectedPlayer.position.y = Y;
 	}
 Array.prototype.contains = function ( needle ) {
    for (i in this) {
