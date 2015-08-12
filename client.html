@@ -24,23 +24,26 @@
 	var userName = '';
 	$('#userlist').html("<p>"+cpath+"</p>"); // Prints current name to userlist (before it's populated on sign-in)
     function init() {
-        scene = new THREE.Scene();
+        // Setup Scene
+		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         renderer = new THREE.WebGLRenderer();
-        renderer.setClearColor(0x000000, 1.0);
+        //renderer.setClearColor(0x000000, 1.0);
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMapEnabled = true;
 		
-		// Lighting
-		var ambientLight = new THREE.AmbientLight(0x808080);
+		// Lights
+		var ambientLight = new THREE.AmbientLight(0x404040);
 		scene.add(ambientLight);
         var spotLight = new THREE.SpotLight(0xffffff);
         spotLight.position.set(10, 20, 20);
         spotLight.shadowCameraNear = 20;
         spotLight.shadowCameraFar = 50;
         spotLight.castShadow = true;
-        scene.add(spotLight);
-        document.body.appendChild(renderer.domElement);  // add the output of the renderer to the DOM
+        //scene.add(spotLight);
+        
+		// Render
+		document.body.appendChild(renderer.domElement);  // add the output of the renderer to the DOM
         render();
     }
     function render() {
@@ -62,32 +65,28 @@
 	var socket = io.connect('http://127.0.0.1:8080/');
     var playerX = new Array();
 	var playerY = new Array(); 
-	var userlist = '';
+	var userlist = new String();
 	var usernumber; 
 	var clientid = new Array();
-	var playerNames = new Array();
-	var colors = new Array();
-    colors = ["red", "blue", "green", "yellow", "red", "blue", "green", "yellow", "red", "blue", "green", "yellow", "red", "blue", "green", "yellow", "red", "blue", "green", "yellow"];
+	var createdPlayers = new Array();
+    var colors = ["red", "blue", "green", "yellow"];
 	socket.on('getplayers', function (user) { // Called by the setname() server function after submit button is pressed
-		users = user; 
+		users = user; //pass parameter to global users
 		console.log("getplayers(user)");
 		console.log("user: " + JSON.stringify(user)); // Returns list of users
-    	userlist = '';
     	var l = user.length;
 	    for (var i = 0; i < l; i++) { 		 
 	    	userlist += user[i][3]+'<br>';  // Add each user name to userlist
     		playerX[i] = user[i][1]; // Get X coordinate of User
 			playerY[i] = user[i][2]; // Get Y coordinate of User
-			//playerNames[i] = user[i][3];
     	}
     	$('#userlist').html('<p>'+userlist+'</p>');
-		draw(user);
+		draw(users);
     });  
     
 	socket.on('syncplayers', function (user) { 
 		console.log("syncplayers(user)");
 		//console.log(JSON.stringify(user));// Returns list of users
-		//console.log(JSON.stringify(users));// Also Returns list of users (?)
 		socketResponse("syncplayers", users);
 		users = user; // passing to global browser users
 		var l = users.length - 1; 
@@ -108,7 +107,6 @@
 	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
 		console.log("playermove()");
 		if("users" in window){
-			//console.log(JSON.stringify(users)); // Displays list of users
 			movePlayer(keystroke,clientIndex);
 			socketResponse("syncplayers", users);
 		}
@@ -153,33 +151,33 @@
         }
 		move_individual(clientIndex);
 	}
-	function draw(user) { // initial draw
-	console.log("Drawing initial users");
-	var l = (users.length) - 1;
-	if("users" in window){
-	for (var i = 0; i <= l; i++) { // loop that draws all users
+	function draw(user) {
+		console.log("Drawing initial users");
+		var l = (users.length) - 1;
 		if("users" in window){
-			console.log(JSON.stringify(users));
-			playerName = users[i][3];
+			for (var i = 0; i <= l; i++) { // loop that draws all users
+				if("users" in window){
+					console.log(JSON.stringify(users));
+					playerName = users[i][3];
+				}
+				console.log("createdPlayers.contains(userName): " + createdPlayers.contains(userName));
+				//!createdPlayers.contains(userName)
+				if(!scene.getObjectByName(createdPlayers[i])){ // create player if doesn't exist
+					make(playerName, playerX[i], playerY[i], 20);
+					createdPlayers.push(user[i][3]);
+				}
+			}
 		}
-		console.log("playerNames.contains(userName): " + playerNames.contains(userName));
-		//!playerNames.contains(userName)
-		if(!scene.getObjectByName(playerNames[i])){ // create player if doesn't exist
-			make(playerName, playerX[i], playerY[i], 20);
-			playerNames.push(user[i][3]);
-		}
-	}
-	}
 	}
 	function make(name, playerX, playerY, playerZ){
 		console.log("make() called.");
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
 		var currentColor = colors[0];
 		//console.log("colors: " + colors);
-		colors.push(currentColor); // Add to end of array, for endless colors
-		colors.splice(0, 1); //Remove first, so next player will get different color
+		colors.push(currentColor); // Add to end of array
+		colors.splice(0, 1); //Remove first element
 		//console.log("new colors: " + colors);
-		var cubeMaterial = new THREE.MeshPhongMaterial({color: currentColor, transparent:false, opacity:1.0});
+		var cubeMaterial = new THREE.MeshBasicMaterial({color: currentColor, transparent:false, opacity:1.0});
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 		cube.position.x = playerX;
         cube.position.y = playerY;
@@ -196,7 +194,7 @@
 	}
 	function move_individual(clientindex){
 		console.log("move_individual()");
-		var selectedPlayer = scene.getObjectByName(playerNames[clientindex]);
+		var selectedPlayer = scene.getObjectByName(createdPlayers[clientindex]);
 		var X = playerX[clientindex];
 		var Y = playerY[clientindex];
 		if(Debug){
