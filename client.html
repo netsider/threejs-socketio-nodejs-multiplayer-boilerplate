@@ -175,8 +175,10 @@
 		console.log("make() called.");
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
 		var currentColor = colors[0];
-		colors.splice(0, 1);
-		console.log("colors: " + colors);
+		//console.log("colors: " + colors);
+		colors.push(currentColor); // Add to end of array, for endless colors
+		colors.splice(0, 1); //Remove first, so next player will get different color
+		//console.log("new colors: " + colors);
 		var cubeMaterial = new THREE.MeshPhongMaterial({color: currentColor, transparent:false, opacity:1.0});
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 		cube.position.x = playerX;
