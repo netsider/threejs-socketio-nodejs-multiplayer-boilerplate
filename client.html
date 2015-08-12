@@ -1,11 +1,8 @@
 <html lang="en">
 		<meta charset="UTF-8" />
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-		<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>	
-		<!-- <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/stats.js/r11/Stats.min.js"></script> -->
-		<!-- <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script> -->
-		<script src="http://cdn.socket.io/socket.io-1.0.0.js"></script> 
-		<!-- <script src="FlyControls.js"></script> -->
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>
+		<script src="http://cdn.socket.io/socket.io-1.0.0.js"></script>
 <body>
  <div id="signin" style="right: 100px;width:20%; margin:30px;position: fixed;background-color: white;opacity: 0.5;">
 		<h1>Please enter your name</h1>
@@ -16,13 +13,14 @@
 	<div id="userlist"></div> 
 </div>
 <script>
-	var Debug = true;
 	var renderer;
     var scene;
     var camera;
+	var Debug = true;
 	var cpath = window.location.pathname.split('/').pop();
 	var userName = '';
-	$('#userlist').html("<p>"+cpath+"</p>"); // Prints current name to userlist (before it's populated on sign-in)
+	var socket = io.connect('http://127.0.0.1:8080/');
+	$('#userlist').html("<p>"+cpath+"</p>");
     function init() {
         // Setup Scene
 		scene = new THREE.Scene();
@@ -86,21 +84,21 @@
     
 	socket.on('syncplayers', function (user) { 
 		console.log("syncplayers(user)");
-		//console.log(JSON.stringify(user));// Returns list of users
+		console.log(JSON.stringify(user));// Returns list of users
 		socketResponse("syncplayers", users);
 		users = user; // passing to global browser users
 		var l = users.length - 1; 
 		for (var i = 0; i < l; i++) { // Loops through all the users in users
 				playerX[i] = user[i][1];
 				playerY[i] = user[i][2];
-				usernumber = users.length;  
+				usernumber = users.length;
+				users[usernumber][0] = i; 
 				users[usernumber][1] = playerX[i];
 				users[usernumber][2] = playerY[i];
 		}
     });
 
     function socketResponse(type, data) {
-   		var socket = io.connect('http://127.0.0.1:8080/');
  	 	socket.emit(type, data);
     }
 
@@ -115,20 +113,26 @@
 	addEventListener('keydown', function(e) { // [1] // Calls keypress() in server.js
 	console.log("keydown()");
     	if("users" in window){
-		if (users.length > 0) { // If users not empty
-	    	var l = users.length; // Loop the length of users array/object
-	    	for (var i = 0; i < l; i++) {
-	    		if (users[i][3] == userName) { // If current user in array equals userName
-	    			clientid = i;
-	    		}
-	    	}
-    	}
+			if (users.length > 0) { // If users not empty
+				var l = users.length; // Loop the length of users array/object
+				for (var i = 0; i < l; i++) {
+					if (users[i][3] == userName) { // If current user in array equals userName
+						clientid = i;
+					}
+				}
+			}
 		}
-    	var clientData = new Array();
+    	var clientData = [];
     	clientData[0] = e.keyCode; // code of key pressed
     	clientData[1] = clientid;  // position of "userName" in array "users"
+    	if(clientData[0] == "37" ||  clientData[0] == "38"){
+			socketResponse('keypress',clientData);
+		}else if(clientData[0] == "39" ||  clientData[0] == "40"){
+			socketResponse('keypress',clientData);
+		}else{
+			console.log("Key pressed didn't meet criteria!");
+		}
 		//console.log(JSON.stringify(clientData));
-    	socketResponse('keypress',clientData); 
 	}, false);   
 	
 	function movePlayer(keyStroke, clientIndex) {	//[3]
@@ -190,6 +194,7 @@
 			playerObject = scene.getObjectByName(userName);
 			scene.player = playerObject;
 			camera.lookAt(playerObject.position); // look at player
+			//console.log("camera: " + JSON.stringify(camera));
 		}
 	}
 	function move_individual(clientindex){

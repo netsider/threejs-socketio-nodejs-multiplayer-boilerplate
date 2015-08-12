@@ -36,19 +36,18 @@ console.log("connection()");
   socket.on('keypress', function (data) {
   console.log("keypress(data)");
     io.sockets.emit('playermove', data[0], data[1]);  
-  });  
-  // Listens for clients leaving game
- // socket.on('leave', function (userName) {
-   // var l = users.length;
-   // for (var i = 0; i < l; i++) {
-   //   if (users[i][3] == userName) {
-   //     clientid = i;
-  //    }
-  //  }  
-  //  users.splice(clientid, 1);
-  //  console.log(users);
-  //  io.sockets.emit('getplayers', users); 
-  //  io.sockets.emit('removeplayer', clientid); 
-  //  io.sockets.emit('playermove', '45', clientid); // To update without keypress on client 
- // }); 
+  });
+ socket.on('leave', function (userName) {
+   var l = users.length;
+   for (var i = 0; i < l; i++) {
+     if (users[i][3] == userName) {
+       clientid = i;
+     }
+   }  
+   users.splice(clientid, 1);
+   console.log(users);
+   io.sockets.emit('getplayers', users); 
+   io.sockets.emit('removeplayer', clientid); 
+   io.sockets.emit('playermove', '45', clientid); // To update without keypress on client 
+ });
 }); 
