@@ -7,9 +7,10 @@
  <div id="signin" style="right: 100px;width:20%; margin:30px;position: fixed;background-color: white;opacity: 0.5;">
 		<h1>Please enter your name</h1>
 		<input type='text' id='userNameField' />
-		<input type="submit" value='Start' onclick='userName = $("#userNameField").val(); socketResponse("setname", $("#userNameField").val()); $("#signin").hide();' />
+		<input type="submit" value='Start' onclick='userName = $("#userNameField").val(); socket.emit("setname", $("#userNameField").val()); $("#signin").hide();' />
 </div>
 <div id="userhead" style="left:100px; width:20%; margin:30px;position: fixed;background-color: white;"><h1>User List</h1><hr>
+	<div id="leave"><button onclick='socket.emit("leave", userName); window.location = "http://www.bing.com/";'>Leave</button></div>
 	<div id="userlist"></div> 
 </div>
 <script>
@@ -59,7 +60,6 @@
     window.onload = init;
     window.addEventListener('resize', handleResize, false);
 
-	// Begin Socket.IO Code
 	var socket = io.connect('http://127.0.0.1:8080/');
     var playerX = new Array();
 	var playerY = new Array(); 
@@ -80,12 +80,11 @@
     	}
     	$('#userlist').html('<p>'+userlist+'</p>');
 		draw(users);
-    });  
-    
+    });
 	socket.on('syncplayers', function (user) { 
 		console.log("syncplayers(user)");
 		console.log(JSON.stringify(user));// Returns list of users
-		socketResponse("syncplayers", users);
+		socket.emit("syncplayers", users);
 		users = user; // passing to global browser users
 		var l = users.length - 1; 
 		for (var i = 0; i < l; i++) { // Loops through all the users in users
@@ -96,20 +95,21 @@
 				users[usernumber][1] = playerX[i];
 				users[usernumber][2] = playerY[i];
 		}
+		
     });
-
-    function socketResponse(type, data) {
- 	 	socket.emit(type, data);
-    }
-
 	socket.on('playermove', function (keystroke, clientIndex) { //Received from server when a player moves // [2]
 		console.log("playermove()");
 		if("users" in window){
 			movePlayer(keystroke,clientIndex);
-			socketResponse("syncplayers", users);
+			socket.emit("syncplayers", users);
 		}
-    }); 
+    });
 	
+	//socket.on('removeplayer', function (clientid) { 
+   // 	playerX.splice(clientid, 1);
+    //	playerY.splice(clientid, 1);
+   // });
+   
 	addEventListener('keydown', function(e) { // [1] // Calls keypress() in server.js
 	console.log("keydown()");
     	if("users" in window){
@@ -126,16 +126,19 @@
     	clientData[0] = e.keyCode; // code of key pressed
     	clientData[1] = clientid;  // position of "userName" in array "users"
     	if(clientData[0] == "37" ||  clientData[0] == "38"){
-			socketResponse('keypress',clientData);
+			socket.emit('keypress',clientData);
 		}else if(clientData[0] == "39" ||  clientData[0] == "40"){
-			socketResponse('keypress',clientData);
+			socket.emit('keypress',clientData);
 		}else{
 			console.log("Key pressed didn't meet criteria!");
 		}
 		//console.log(JSON.stringify(clientData));
 	}, false);   
 	
-	function movePlayer(keyStroke, clientIndex) {	//[3]
+	function socketResponse(type, data) {
+ 	 	socket.emit(type, data);
+    };
+	function movePlayer(keyStroke, clientIndex) {
 		console.log("movePlayer()");
 		console.log("clientIndex: " + JSON.stringify(clientIndex));
 		console.log("keyStroke: " + JSON.stringify(keyStroke));		
@@ -154,7 +157,7 @@
             users[clientIndex][2] = playerY[clientIndex];
         }
 		move_individual(clientIndex);
-	}
+	};
 	function draw(user) {
 		console.log("Drawing initial users");
 		var l = (users.length) - 1;
@@ -174,7 +177,7 @@
 		}
 	}
 	function make(name, playerX, playerY, playerZ){
-		console.log("make() called.");
+		console.log("------make()------");
         var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
 		var currentColor = colors[0];
 		//console.log("colors: " + colors);
@@ -213,6 +216,10 @@
 		selectedPlayer.position.x = X;
 		selectedPlayer.position.y = Y;
 	}
+	//function leave(username){
+	//	var user = username;
+	//	socket.emit("leave", user);
+	//}
 Array.prototype.contains = function ( needle ) {
    for (i in this) {
        if (this[i] == needle) return true;
